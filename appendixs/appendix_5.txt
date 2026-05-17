@@ -1,0 +1,58 @@
+Project MedLab_Extended {
+  database_type: 'PostgreSQL'
+  Note: 'Оновлена БД з тригерами, логуванням та ENUM'
+}
+
+Enum test_status_enum {
+  Pending
+  Processing
+  Completed
+  Cancelled
+}
+
+Table patients {
+  patient_id int [pk, increment]
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  birth_date date
+  phone varchar(15)
+  gender varchar(10)
+}
+
+Table doctors {
+  doctor_id int [pk, increment]
+  full_name varchar(100) [not null]
+  specialization varchar(50)
+}
+
+Table tests {
+  test_id int [pk, increment]
+  test_name varchar(100) [not null]
+  price decimal(10, 2) [not null]
+}
+
+Table orders {
+  order_id int [pk, increment]
+  patient_id int [ref: > patients.patient_id]
+  doctor_id int [ref: > doctors.doctor_id]
+  order_date timestamp
+  total_amount decimal(10, 2) [note: 'Автоматично оновлюється тригером trg_sync_order_total']
+}
+
+Table order_details {
+  detail_id int [pk, increment]
+  order_id int [ref: > orders.order_id]
+  test_id int [ref: > tests.test_id]
+  result_value varchar(50)
+  status test_status_enum [default: 'Pending']
+}
+
+Table order_details_log {
+  log_id int [pk, increment]
+  detail_id int [ref: > order_details.detail_id]
+  operation varchar(10)
+  old_status test_status_enum
+  new_status test_status_enum
+  changed_at timestamp
+  changed_by varchar(50)
+}
