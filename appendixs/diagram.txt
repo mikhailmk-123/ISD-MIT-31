@@ -1,0 +1,43 @@
+Project MedLab {
+  database_type: 'PostgreSQL'
+  Note: 'База даних медичної лабораторії'
+}
+
+Table patients {
+  patient_id int [pk, increment]
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  birth_date date
+  phone varchar(15)
+  gender varchar(10)
+}
+
+Table doctors {
+  doctor_id int [pk, increment]
+  full_name varchar(100) [not null]
+  specialization varchar(50)
+  clinic_name varchar(100)
+}
+
+Table tests {
+  test_id int [pk, increment]
+  test_name varchar(100) [not null]
+  price decimal(10, 2) [not null]
+  normal_range varchar(50)
+}
+
+Table orders {
+  order_id int [pk, increment]
+  patient_id int [ref: > patients.patient_id]
+  doctor_id int [null, ref: > doctors.doctor_id]
+  order_date timestamp [default: `now()`]
+  total_amount decimal(10, 2)
+}
+
+Table order_details {
+  detail_id int [pk, increment]
+  order_id int [ref: > orders.order_id]
+  test_id int [ref: > tests.test_id]
+  result_value varchar(50)
+  status varchar(20) [default: 'Pending']
+}
